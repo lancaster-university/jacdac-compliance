@@ -1,6 +1,6 @@
-#include "ComplianceInterface.h"
+#include "compliance_interface.h"
 
 int main()
 {
-    device_main();
+    return device_main();
 }

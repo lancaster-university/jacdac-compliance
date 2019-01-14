@@ -1,153 +1,66 @@
-# Codal [![Build Status](https://travis-ci.org/lancaster-university/codal.svg?branch=master)](https://travis-ci.org/lancaster-university/codal)
+# JACDAC Compliance Testing
 
-The main repository for the Component Oriented Device Abstraction Layer (CODAL).
+This repository is the ground truth on how JACDAC should behave. It subjects a JACDAC device to a number of tests with increasing complexity.
 
-This repository is an empty shell that provides the tooling needed to produce a bin/hex/uf2 file for a CODAL device.
+## Device requirements
 
-## Installation
+* 3 GPIOs
+    - Reset line –– Used to trigger a reset (in some cases this might be required).
+    - tx/rx line –– Used for two purposes: (1) acknowledge a packet has been received; (2) cause a packet to be sent from the device under test (DUT).
+    - Error line –– When toggled to one, an error has occurred.
+* Serial output (for outputting test results). The interface simply expects a buffer, so alternate output mechanisms can be used instead.
+* A verified and JACDAC capable device.
 
-### Automatic installation.
+# Transmission / Reception Tests
 
-This software has its grounding on the founding principles of [Yotta](https://www.mbed.com/en/platform/software/mbed-yotta/), the simplest install path would be to install their tools via their handy installer.
+## Tester sends a JDPacket
 
-### Docker
+### Test Outline
+1. Tester sends a packet to the DUT containing the test number.
+2. DUT receives the packet and processes the test number
+3. DUT toggles the tx/rx line to indicate the packet has been received correctly.
 
-A [docker image](https://hub.docker.com/r/jamesadevine/codal-toolchains/) is available that contains toolchains used to build codal targets. A wrapper [Dockerfile](https://github.com/lancaster-university/codal-docker) is available that can be used to build your project with ease.
+### Expected Result
+The tester should expect the tx/rx line to be toggled, and set the result to 0 (a success).
 
-Then follow the build steps listed below.
+## DUT sends a JDPacket
 
-### Manual installation
+### Test Outline
+1. Tester sends a packet to the DUT containing the test number.
+2. DUT receives the packet and processes the test number
+3. DUT sends JDPacket with the test number to the TESTER.
 
-1. Install `git`, ensure it is available on your platforms path.
-2. Install the `arm-none-eabi-*` command line utilities for ARM based devices and/or `avr-gcc`, `avr-binutils`, `avr-libc` for AVR based devices, ensure they are available on your platforms path.
-3. Install [CMake](https://cmake.org)(Cross platform make), this is the entirety of the build system.
-    5. If on Windows, install ninja.
-4. Install `Python 2.7` (if you are unfamiliar with CMake), python scripts are used to simplify the build process.
-5. Clone this repository
+### Expected Result
+The tester should expect to receive a packet and set the result to 0 (a success).
 
-# Building
-- Generate or create a `codal.json` file
-    - `python build.py ls` lists all available targets
-    - `python build.py <target-name>` generates a codal.json file for a given target
-- In the root of this repository type `python build.py` the `-c` option cleans before building.
-    - If you are not using python:
-        - Windows:
-            1. In the root of the repository make a build folder.
-            2. `cd build`
-            3. `cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=RelWithDebInfo`
-            4. `ninja`
-        - Mac:
-            1. In the root of the repository make a build folder.
-            2. `cd build`
-            3. `cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo`
-            4. `make`
+## Tester sends a JDPacket with an incorrect checksum
 
-- The hex file will be placed at the location specified by `codal.json`, by default this is the root.
+### Test Outline
+1. Tester sends a packet to the DUT with an incorrect crc
+2. DUT toggles the error line to indicate the packet has not been received.
 
-# Configuration
+### Expected Result
+The tester should expect the error line to be toggled, and set the result to 0 (a success).
 
-Below is an example of how to configure codal to build the [codal-circuit-playground](https://github.com/lancaster-university/codal-circuit-playground) target, example applications will automatically be loaded into the "source" folder:
+## Tester sends a JDPacket with an incorrect size
 
-```json
-{
-    "target":{
-        "name":"codal-circuit-playground",
-        "url":"https://github.com/lancaster-university/codal-circuit-playground",
-        "branch":"master",
-        "type":"git"
-    }
-}
-```
+This test observes if a device meets the maximum timeout permitted on the JACDAC bus. If a device is expecting to receive more bytes than it's given, the device should timeout as per the JACDAC specification.
 
-For more targets, read the targets section below.
+### Test Outline
+1. Tester sends a packet to the DUT with a size bigger than the number of transmitted bytes
+2. DUT toggles the error line to indicate the packet has not been received.
 
-## Advanced
+### Expected Result
+The tester should expect the error line to be toggled, and set the result to 0 (a success).
 
-If you would like to override or define any additional configuration options (`#define's`) that are used by the supporting libraries, the codal build system allows the addition of a config field in `codal.json`:
+## Tester sends a JDPacket and triggers a UART error condition
 
-```json
-{
-    "target":{
-        "name":"codal-circuit-playground",
-        "url":"https://github.com/lancaster-university/codal-circuit-playground",
-        "branch":"master",
-        "type":"git"
-    },
-    "config":{
-        "NUMBER_ONE":1
-    },
-    "application":"source",
-    "output_folder":"."
-}
-```
+This test observes if a device identifies UART error conditions
 
-The above example will be translate `"NUMBER_ONE":1` into: `#define NUMBER_ONE     1` and force include it during compilation. You can also specify alternate application or output folders.
+### Test Outline
+1. Tester sends a JDPacket header to the DUT and drives the line low.
+2. DUT toggles the error line to indicate the packet has not been received.
 
-# Targets
+### Expected Result
+The tester should expect the error line to be toggled, and set the result to 0 (a success).
 
-To obtain a full list of targets type:
-
-```
-python build.py ls
-```
-
-To generate the `codal.json` for a target listed by the ls command, please run:
-
-```
-python build.py <target-name>
-```
-
-Please note you may need to remove the libraries folder if your previous build relied on similar dependencies.
-
-## Arduino Uno
-
-This target specifies the arduino uno which is driven by an atmega328p.
-
-### codal.json specification
-```json
-"target":{
-    "name":"codal-arduino-uno",
-    "url":"https://github.com/lancaster-university/codal-arduino-uno",
-    "branch":"master",
-    "type":"git"
-}
-```
-This target depends on:
-* [codal-core](https://github.com/lancaster-university/codal-core) provides the core CODAL abstractions
-* [codal-atmega328p](https://github.com/lancaster-university/codal-atmega328p) implements basic CODAL components (I2C, Pin, Serial, Timer)
-
-## BrainPad
-
-This target specifies the BrainPad which is driven by a STM32F.
-
-### codal.json specification
-```json
-"target":{
-    "name":"codal-brainpad",
-    "url":"https://github.com/lancaster-university/codal-brainpad",
-    "branch":"master",
-    "type":"git"
-}
-```
-This target depends on:
-* [codal-core](https://github.com/lancaster-university/codal-core) provides the core CODAL abstractions
-* [codal-mbedos](https://github.com/lancaster-university/codal-mbed) implements required CODAL basic components (Timer, Serial, Pin, I2C, ...) using Mbed
-
-## Circuit Playground
-
-This target specifies the circuit playground which is driven by a SAMD21.
-
-### codal.json specification
-```json
-"target":{
-    "name":"codal-circuit-playground",
-    "url":"https://github.com/lancaster-university/codal-circuit-playground",
-    "branch":"master",
-    "type":"git"
-}
-```
-This target depends on:
-* [codal-core](https://github.com/lancaster-university/codal-core) provides the core CODAL abstractions
-* [codal-mbed](https://github.com/lancaster-university/codal-mbed) implements required CODAL basic components (Timer, Serial, Pin, I2C, ...) using Mbed
-* [codal-samd21](https://github.com/lancaster-university/codal-samd21) implements SAMD21-specific components (such as USB)
-* [mbed-classic](https://github.com/lancaster-university/mbed-classic) is a fork of mbed, used by codal-mbed
