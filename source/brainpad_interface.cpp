@@ -10,7 +10,7 @@ BrainPad bp;
 
 // ZSingleWireSerial serialOut(bp.io.d1);
 
-#define DEVICE_TESTER_PIN_RESET     bp.io.d2
+#define DEVICE_TESTER_PIN_RESET     bp.io.d3
 #define DEVICE_TESTER_PIN_TX_RX     bp.io.d4
 #define DEVICE_TESTER_PIN_ERROR     bp.io.d5
 
@@ -29,19 +29,44 @@ void on_error_high(Event)
     on_error_gpio_high();
 }
 
+void configure_error_interrupt(bool enable)
+{
+    if (enable)
+    {
+        bp.messageBus.listen(DEVICE_TESTER_PIN_ERROR.id, DEVICE_PIN_EVT_RISE, on_error_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
+        DEVICE_TESTER_PIN_ERROR.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
+    }
+    else
+        bp.messageBus.ignore(DEVICE_TESTER_PIN_ERROR.id, DEVICE_PIN_EVT_RISE, on_error_high);
+}
+void configure_tx_rx_interrupt(bool enable)
+{
+    if (enable)
+    {
+        bp.messageBus.listen(DEVICE_TESTER_PIN_TX_RX.id, DEVICE_PIN_EVT_RISE, on_tx_rx_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
+        DEVICE_TESTER_PIN_TX_RX.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
+    }
+    else
+        bp.messageBus.ignore(DEVICE_TESTER_PIN_TX_RX.id, DEVICE_PIN_EVT_RISE, on_tx_rx_high);
+}
+
+void configure_reset_interrupt(bool enable)
+{
+    if (enable)
+    {
+        bp.messageBus.listen(DEVICE_TESTER_PIN_RESET.id, DEVICE_PIN_EVT_RISE, on_reset_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
+        DEVICE_TESTER_PIN_RESET.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
+    }
+    else
+        bp.messageBus.ignore(DEVICE_TESTER_PIN_RESET.id, DEVICE_PIN_EVT_RISE, on_reset_high);
+}
+
 void device_init()
 {
     bp.init();
-
-    bp.messageBus.listen(DEVICE_TESTER_PIN_RESET.id, DEVICE_PIN_EVT_RISE, on_reset_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
-    bp.messageBus.listen(DEVICE_TESTER_PIN_TX_RX.id, DEVICE_PIN_EVT_RISE, on_tx_rx_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
-    bp.messageBus.listen(DEVICE_TESTER_PIN_ERROR.id, DEVICE_PIN_EVT_RISE, on_error_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
-
-    DEVICE_TESTER_PIN_RESET.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
-    DEVICE_TESTER_PIN_TX_RX.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
-    DEVICE_TESTER_PIN_ERROR.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
-
-    bp.jacdac.start();
+    DEVICE_TESTER_PIN_RESET.setDigitalValue(0);
+    DEVICE_TESTER_PIN_TX_RX.setDigitalValue(0);
+    DEVICE_TESTER_PIN_ERROR.setDigitalValue(0);
 }
 
 void device_reset()
@@ -50,7 +75,12 @@ void device_reset()
     target_reset();
 }
 
-void initialise_jacdac_protocol()
+void jacdac_init()
+{
+    bp.jacdac.start();
+}
+
+void jacdac_protocol_init()
 {
 
 }

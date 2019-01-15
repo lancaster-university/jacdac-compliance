@@ -11,11 +11,12 @@ int device_main()
     set_reset_gpio(LINE_ACTIVE_VALUE);
     wait_us(100);
     set_reset_gpio(!LINE_ACTIVE_VALUE);
-
-    while(get_tx_rx_gpio() == !LINE_ACTIVE_VALUE);
+    wait_ms(1);
+    while(get_tx_rx_gpio() != LINE_ACTIVE_VALUE);
     set_test_status(1);
-
+    wait_ms(1);
     DMESG("AFTER");
+    jacdac_init();
 
     int results[JACDAC_TEST_COUNT];
 
@@ -28,7 +29,6 @@ int device_main()
     {
         DMESG("T%d: %d", i, results[i]);
     }
-
     return 0;
 }
 

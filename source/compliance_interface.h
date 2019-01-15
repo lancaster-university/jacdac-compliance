@@ -11,8 +11,8 @@ typedef codal::JDPacket JDPacket;
 #include <stdint.h>
 #include <stdio.h>
 
-// #define DEVICE_TESTER CODAL_STM32_BRAINPAD
-#define DEVICE_UNDER_TEST CODAL_STM32_BRAINPAD
+#define DEVICE_TESTER CODAL_STM32_BRAINPAD
+// #define DEVICE_UNDER_TEST CODAL_STM32_BRAINPAD
 
 #ifdef DEVICE_TESTER
 #pragma message "DEVICE_TESTER"
@@ -24,15 +24,21 @@ typedef codal::JDPacket JDPacket;
 
 void serial_tx(uint8_t* buf, int len);
 
+void jacdac_init();
+void jacdac_protocol_init();
 void jacdac_send_no_crc(JDPacket*);
 void jacdac_send(JDPacket*);
 void jacdac_send(uint8_t* buf, int len);
 JDPacket* jacdac_receive();
 
 void set_reset_gpio(int);
-
 void set_tx_rx_gpio(int);
 void set_error_gpio(int);
+
+void configure_error_interrupt(bool);
+void configure_tx_rx_interrupt(bool);
+void configure_reset_interrupt(bool);
+
 void set_test_status(int);
 
 void on_reset_gpio_high();

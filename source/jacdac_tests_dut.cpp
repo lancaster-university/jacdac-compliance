@@ -9,7 +9,6 @@ volatile int error = 0;
 
 void on_reset_gpio_high()
 {
-    while(1);
     device_reset();
 }
 
@@ -25,6 +24,7 @@ void on_error_gpio_high()
 
 int packet_received_from_tester()
 {
+    DMESG("TEST 0");
     set_tx_rx_gpio(LINE_ACTIVE_VALUE);
     wait_us(10);
     set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
@@ -33,6 +33,7 @@ int packet_received_from_tester()
 
 int send_packet_to_tester()
 {
+    DMESG("TEST 1");
     while(get_tx_rx_gpio() == !LINE_ACTIVE_VALUE);
     int testNumber = 1;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));

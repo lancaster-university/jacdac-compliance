@@ -39,7 +39,10 @@ int send_jacdac_packet_to_DUT()
 {
     int testNumber = 0;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));
+
+    configure_tx_rx_interrupt(true);
     wait_ms(20);
+    configure_tx_rx_interrupt(false);
 
     int res = read_tx_rx_gpio();
     return (res > 0) ? 0 : -1;
@@ -49,7 +52,7 @@ int DUT_send_jacdac_packet()
 {
     int testNumber = 1;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));
-    wait_us(250);
+    wait_ms(10);
     set_tx_rx_gpio(LINE_ACTIVE_VALUE);
     wait_us(10);
     set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
@@ -83,7 +86,9 @@ int tester_send_incorrect_chksum()
     jacdac_send_no_crc(packet);
     delete packet;
 
+    configure_error_interrupt(true);
     wait_ms(20);
+    configure_error_interrupt(false);
 
     int res = read_error_gpio();
     return (res == 1) ? 0 : -1;

@@ -33,6 +33,15 @@ The tester should expect the tx/rx line to be toggled, and set the result to 0 (
 ### Expected Result
 The tester should expect to receive a packet and set the result to 0 (a success).
 
+## Tester pulses the TX line
+
+### Test Outline
+1. Tester toggles the JACDAC TX line
+2. DUT toggles the error line to indicate an error has been observed on the bus.
+
+### Expected Result
+The tester should expect the error line to be toggled, and set the result to 0 (a success).
+
 ## Tester sends a JDPacket with an incorrect checksum
 
 ### Test Outline
@@ -64,3 +73,13 @@ This test observes if a device identifies UART error conditions
 ### Expected Result
 The tester should expect the error line to be toggled, and set the result to 0 (a success).
 
+
+## Time the accuracy of the lo pulse
+
+### Test Outline
+1. Tester toggles tx/rx line
+2. DUT sends a packet.
+3. The LO pulse is timed for accuracy
+
+### Expected Result
+If the pulse is within tolerance (+/- 20%) of the current baud rate. (This means slower devices have a wider tolerance).

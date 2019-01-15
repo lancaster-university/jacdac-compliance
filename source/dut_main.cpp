@@ -8,11 +8,17 @@ int device_main()
 {
     device_init();
 
-    wait_us(10000);
-    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
-    wait_us(10);
-    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    // configure to reset the device when the line is driven high
+    configure_reset_interrupt(true);
+    set_test_status(0);
+    wait_us(1000000);
     set_test_status(1);
+    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
+    wait_us(100);
+    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    jacdac_init();
+
+    DMESG("ALIVE");
 
     JDPacket* packet = NULL;
     while(1)

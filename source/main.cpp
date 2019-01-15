@@ -2,5 +2,7 @@
 
 int main()
 {
-    return device_main();
+    device_main();
+    while (1);
+    return 0;
 }
