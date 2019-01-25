@@ -11,6 +11,17 @@ This repository is the ground truth on how JACDAC should behave. It subjects a J
 * Serial output (for outputting test results). The interface simply expects a buffer, so alternate output mechanisms can be used instead.
 * A verified and JACDAC capable device.
 
+# Physical layer tests
+
+## Tester checks the TX line
+
+### Test Outline
+1. The tester reads the default state of the tx line with NO PULL.
+
+### Expected Result
+The tester should expect the tx line to be hi.
+
+
 # Transmission / Reception Tests
 
 ## Tester sends a JDPacket

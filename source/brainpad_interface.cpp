@@ -14,6 +14,28 @@ BrainPad bp;
 #define DEVICE_TESTER_PIN_TX_RX     bp.io.d4
 #define DEVICE_TESTER_PIN_ERROR     bp.io.d5
 
+PullMode translate_to_pullmode(int pm)
+{
+    if (pm == JACDAC_GPIO_PULL_MODE_UP)
+        return PullMode::Up;
+    if (pm == JACDAC_GPIO_PULL_MODE_NONE)
+        return PullMode::None;
+    if (pm == JACDAC_GPIO_PULL_MODE_DOWN)
+        return PullMode::Down;
+
+    return PullMode::Up;
+}
+
+void set_gpio(int val)
+{
+    bp.io.d6.setDigitalValue(val);
+}
+
+void set_gpio2(int val)
+{
+    bp.io.d7.setDigitalValue(val);
+}
+
 void on_reset_high(Event)
 {
     on_reset_gpio_high();
@@ -67,11 +89,12 @@ void device_init()
     DEVICE_TESTER_PIN_RESET.setDigitalValue(0);
     DEVICE_TESTER_PIN_TX_RX.setDigitalValue(0);
     DEVICE_TESTER_PIN_ERROR.setDigitalValue(0);
+    set_gpio(0);
+    set_gpio2(0);
 }
 
 void device_reset()
 {
-    DMESG("RESET!");
     target_reset();
 }
 
@@ -97,12 +120,17 @@ void jacdac_send(JDPacket* packet)
 
 void jacdac_send(uint8_t* buf, int len)
 {
-    bp.jacdac.send(buf, len, 255);
+    bp.jacdac.send(buf, len, 255, bp.jacdac.getMaximumBaud());
 }
 
 JDPacket* jacdac_receive()
 {
     return bp.jacdac.getPacket();
+}
+
+void set_jacdac_gpio(int value)
+{
+    bp.sws.p.setDigitalValue(value);
 }
 
 void set_reset_gpio(int value)
@@ -125,19 +153,24 @@ void set_test_status(int value)
     bp.io.ledGreen.setDigitalValue(value);
 }
 
-int get_reset_gpio()
+int get_reset_gpio(int pm)
 {
-    return DEVICE_TESTER_PIN_RESET.getDigitalValue(PullMode::Down);
+    return DEVICE_TESTER_PIN_RESET.getDigitalValue(translate_to_pullmode(pm));
 }
 
-int get_tx_rx_gpio()
+int get_tx_rx_gpio(int pm)
 {
-    return DEVICE_TESTER_PIN_TX_RX.getDigitalValue(PullMode::Down);
+    return DEVICE_TESTER_PIN_TX_RX.getDigitalValue(translate_to_pullmode(pm));
 }
 
-int get_error_gpio()
+int get_error_gpio(int pm)
 {
-    return DEVICE_TESTER_PIN_ERROR.getDigitalValue(PullMode::Down);
+    return DEVICE_TESTER_PIN_ERROR.getDigitalValue(translate_to_pullmode(pm));
+}
+
+int get_jacdac_gpio(int pm)
+{
+    return bp.sws.p.getDigitalValue(translate_to_pullmode(pm));
 }
 
 void serial_tx(uint8_t* buf, int len)

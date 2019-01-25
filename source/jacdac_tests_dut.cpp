@@ -22,7 +22,12 @@ void on_error_gpio_high()
     error = 1;
 }
 
-int packet_received_from_tester()
+/**
+ * packet_received_from_tester
+ *
+ * toggles the tx_rx line to indicate a packet has been received.
+ **/
+JACDAC_TEST(0)
 {
     DMESG("TEST 0");
     set_tx_rx_gpio(LINE_ACTIVE_VALUE);
@@ -31,20 +36,17 @@ int packet_received_from_tester()
     return 0;
 }
 
-int send_packet_to_tester()
+/**
+ * send_packet_to_tester
+ * Sends a jacdac packet to the tester.
+ **/
+JACDAC_TEST(1)
 {
     DMESG("TEST 1");
-    while(get_tx_rx_gpio() == !LINE_ACTIVE_VALUE);
+    while(get_tx_rx_gpio(JACDAC_GPIO_PULL_MODE_UP) == !LINE_ACTIVE_VALUE);
     int testNumber = 1;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));
     return 0;
 }
-
-int (*jacdac_tests[JACDAC_TEST_COUNT])() =
-{
-    packet_received_from_tester,
-    send_packet_to_tester
-};
-
 
 #endif

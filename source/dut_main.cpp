@@ -11,7 +11,7 @@ int device_main()
     // configure to reset the device when the line is driven high
     configure_reset_interrupt(true);
     set_test_status(0);
-    wait_us(1000000);
+    wait_us(500000);
     set_test_status(1);
     set_tx_rx_gpio(LINE_ACTIVE_VALUE);
     wait_us(100);

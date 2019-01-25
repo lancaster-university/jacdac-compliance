@@ -35,7 +35,7 @@ int read_error_gpio()
     return res;
 }
 
-int send_jacdac_packet_to_DUT()
+JACDAC_TEST(0)
 {
     int testNumber = 0;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));
@@ -48,7 +48,7 @@ int send_jacdac_packet_to_DUT()
     return (res > 0) ? 0 : -1;
 }
 
-int DUT_send_jacdac_packet()
+JACDAC_TEST(1)
 {
     int testNumber = 1;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));
@@ -93,13 +93,5 @@ int tester_send_incorrect_chksum()
     int res = read_error_gpio();
     return (res == 1) ? 0 : -1;
 }
-
-
-
-int (*jacdac_tests[JACDAC_TEST_COUNT])() =
-{
-    send_jacdac_packet_to_DUT,
-    DUT_send_jacdac_packet
-};
 
 #endif
