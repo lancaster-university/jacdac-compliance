@@ -51,36 +51,55 @@ void on_error_high(Event)
     on_error_gpio_high();
 }
 
+void on_jacdac_error(Event)
+{
+    set_error_gpio(1);
+    wait_us(40);
+    set_error_gpio(0);
+}
+
 void configure_error_interrupt(bool enable)
 {
     if (enable)
     {
+        DEVICE_TESTER_PIN_ERROR.disconnect();
         bp.messageBus.listen(DEVICE_TESTER_PIN_ERROR.id, DEVICE_PIN_EVT_RISE, on_error_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
         DEVICE_TESTER_PIN_ERROR.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
     }
     else
+    {
         bp.messageBus.ignore(DEVICE_TESTER_PIN_ERROR.id, DEVICE_PIN_EVT_RISE, on_error_high);
+        DEVICE_TESTER_PIN_ERROR.eventOn(DEVICE_PIN_EVENT_NONE);
+    }
 }
 void configure_tx_rx_interrupt(bool enable)
 {
     if (enable)
     {
+        DEVICE_TESTER_PIN_TX_RX.disconnect();
         bp.messageBus.listen(DEVICE_TESTER_PIN_TX_RX.id, DEVICE_PIN_EVT_RISE, on_tx_rx_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
         DEVICE_TESTER_PIN_TX_RX.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
     }
     else
+    {
         bp.messageBus.ignore(DEVICE_TESTER_PIN_TX_RX.id, DEVICE_PIN_EVT_RISE, on_tx_rx_high);
+        DEVICE_TESTER_PIN_TX_RX.eventOn(DEVICE_PIN_EVENT_NONE);
+    }
 }
 
 void configure_reset_interrupt(bool enable)
 {
     if (enable)
     {
+        DEVICE_TESTER_PIN_RESET.disconnect();
         bp.messageBus.listen(DEVICE_TESTER_PIN_RESET.id, DEVICE_PIN_EVT_RISE, on_reset_high, MESSAGE_BUS_LISTENER_IMMEDIATE);
         DEVICE_TESTER_PIN_RESET.eventOn(DEVICE_PIN_EVENT_ON_EDGE);
     }
     else
+    {
         bp.messageBus.ignore(DEVICE_TESTER_PIN_RESET.id, DEVICE_PIN_EVT_RISE, on_reset_high);
+        DEVICE_TESTER_PIN_RESET.eventOn(DEVICE_PIN_EVENT_NONE);
+    }
 }
 
 void device_init()
@@ -101,6 +120,8 @@ void device_reset()
 void jacdac_init()
 {
     bp.jacdac.start();
+    bp.messageBus.listen(bp.jacdac, JD_SERIAL_EVT_BUS_ERROR, on_jacdac_error, MESSAGE_BUS_LISTENER_IMMEDIATE);
+    bp.messageBus.listen(bp.jacdac, JD_SERIAL_EVT_CRC_ERROR, on_jacdac_error, MESSAGE_BUS_LISTENER_IMMEDIATE);
 }
 
 void jacdac_protocol_init()

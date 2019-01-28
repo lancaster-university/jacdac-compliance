@@ -22,14 +22,20 @@ void on_error_gpio_high()
     error = 1;
 }
 
+JACDAC_TEST(0)
+{
+    // empty, no packet transferred.
+    return 0;
+}
+
 /**
  * packet_received_from_tester
  *
  * toggles the tx_rx line to indicate a packet has been received.
  **/
-JACDAC_TEST(0)
+JACDAC_TEST(1)
 {
-    DMESG("TEST 0");
+    DMESG("TEST 1");
     set_tx_rx_gpio(LINE_ACTIVE_VALUE);
     wait_us(10);
     set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
@@ -40,13 +46,63 @@ JACDAC_TEST(0)
  * send_packet_to_tester
  * Sends a jacdac packet to the tester.
  **/
-JACDAC_TEST(1)
+JACDAC_TEST(2)
 {
-    DMESG("TEST 1");
-    while(get_tx_rx_gpio(JACDAC_GPIO_PULL_MODE_UP) == !LINE_ACTIVE_VALUE);
-    int testNumber = 1;
+    DMESG("TEST 2");
+    while(get_tx_rx_gpio(JACDAC_GPIO_PULL_MODE_DOWN) == !LINE_ACTIVE_VALUE);
+    int testNumber = 2;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));
     return 0;
 }
+
+/**
+ * packet with an incorrect crc sent from tester
+ * toggles the error line to indicate a packet has been received.
+ **/
+JACDAC_TEST(3)
+{
+    // empty, error should trigger the next test
+    return 0;
+}
+
+/**
+ * bus is driven low for an incorrect amount of time, then a packet is sent.
+ *
+ * This tests error detection and recovery.
+ **/
+JACDAC_TEST(4)
+{
+    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
+    wait_us(10);
+    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    return 0;
+}
+
+/**
+ * bus is driven low for a really long amount of time, then a packet is sent.
+ *
+ * This tests error detection and recovery.
+ **/
+JACDAC_TEST(5)
+{
+    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
+    wait_us(10);
+    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    return 0;
+}
+
+/**
+ * bus is driven low for 10 us, wait 40 us, send junk. After erroring, tester sends packet.
+ *
+ * This tests error detection and recovery.
+ **/
+JACDAC_TEST(6)
+{
+    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
+    wait_us(10);
+    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    return 0;
+}
+
 
 #endif
