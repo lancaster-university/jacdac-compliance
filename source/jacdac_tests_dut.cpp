@@ -104,5 +104,43 @@ JACDAC_TEST(6)
     return 0;
 }
 
+/**
+ * bus is driven low for 10 us, wait 40 us, send 3 junk bytes, (header timeout test)
+ *
+ * This tests error detection and recovery.
+ **/
+JACDAC_TEST(7)
+{
+    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
+    wait_us(10);
+    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    return 0;
+}
+
+/**
+ * bus is driven low for 10 us, line twiddled for three bytes, then an actual packet is sent immediately
+ *
+ * This tests error detection and recovery.
+ **/
+JACDAC_TEST(8)
+{
+    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
+    wait_us(10);
+    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    return 0;
+}
+
+/**
+ * bus is driven low for 10 us, packet after 300 us
+ *
+ * This tests error detection and recovery.
+ **/
+JACDAC_TEST(9)
+{
+    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
+    wait_us(10);
+    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    return 0;
+}
 
 #endif

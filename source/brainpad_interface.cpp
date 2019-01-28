@@ -28,10 +28,20 @@ PullMode translate_to_pullmode(int pm)
 
 void set_gpio(int val)
 {
-    bp.io.d6.setDigitalValue(val);
+    bp.io.d1.setDigitalValue(val);
 }
 
 void set_gpio2(int val)
+{
+    bp.io.d2.setDigitalValue(val);
+}
+
+void set_gpio3(int val)
+{
+    bp.io.d6.setDigitalValue(val);
+}
+
+void set_gpio4(int val)
 {
     bp.io.d7.setDigitalValue(val);
 }
@@ -110,6 +120,8 @@ void device_init()
     DEVICE_TESTER_PIN_ERROR.setDigitalValue(0);
     set_gpio(0);
     set_gpio2(0);
+    set_gpio3(0);
+    set_gpio4(0);
 }
 
 void device_reset()

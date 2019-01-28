@@ -97,7 +97,7 @@ JACDAC_TEST(3)
     packet->address = 255;
     packet->size = 4;
     int* data = (int*)packet->data;
-    *data = 4;
+    *data = 3;
 
     read_error_gpio();
 
@@ -220,15 +220,90 @@ JACDAC_TEST(7)
     for(int i = 0; i < 3; i++)
     {
         set_jacdac_gpio(0);
-        wait_us(7);
+        wait_us(6);
+        set_jacdac_gpio(1);
+        wait_us(1);
     }
 
-    wait_us(40);
+    wait_us(400);
     configure_error_interrupt(false);
+
+    get_jacdac_gpio(JACDAC_GPIO_PULL_MODE_UP);
 
     int error_triggered = read_error_gpio();
 
     int testNumber = 7;
+    jacdac_send((uint8_t*)&testNumber, sizeof(int));
+
+    read_tx_rx_gpio();
+    configure_error_interrupt(true);
+    configure_tx_rx_interrupt(true);
+    wait_ms(20);
+    configure_tx_rx_interrupt(false);
+    configure_error_interrupt(false);
+
+    int packet_received = read_tx_rx_gpio();
+    int error_triggered_rx = read_error_gpio();
+
+    return (error_triggered && packet_received && !error_triggered_rx) ? 0 : -1;
+}
+
+// bus lo 10 us, wait 40 us, toggle line at 7 us 3 times, then stop, no delay send packet.
+JACDAC_TEST(8)
+{
+    read_error_gpio();
+
+    configure_error_interrupt(true);
+    set_jacdac_gpio(0);
+    wait_us(10);
+    set_jacdac_gpio(1);
+    wait_us(40);
+
+    for(int i = 0; i < 3; i++)
+    {
+        set_jacdac_gpio(0);
+        wait_us(6);
+        set_jacdac_gpio(1);
+        wait_us(1);
+    }
+
+    configure_error_interrupt(false);
+
+    get_jacdac_gpio(JACDAC_GPIO_PULL_MODE_UP);
+
+    int error_triggered = read_error_gpio();
+
+    int testNumber = 7;
+    jacdac_send((uint8_t*)&testNumber, sizeof(int));
+
+    read_tx_rx_gpio();
+    configure_error_interrupt(true);
+    configure_tx_rx_interrupt(true);
+    wait_ms(20);
+    configure_tx_rx_interrupt(false);
+    configure_error_interrupt(false);
+
+    int packet_received = read_tx_rx_gpio();
+    int error_triggered_rx = read_error_gpio();
+
+    return (error_triggered && packet_received && !error_triggered_rx) ? 0 : -1;
+}
+
+// bus lo 10 us, never send data, send packet after.
+JACDAC_TEST(9)
+{
+    read_error_gpio();
+
+    configure_error_interrupt(true);
+    set_jacdac_gpio(0);
+    wait_us(10);
+    set_jacdac_gpio(1);
+    wait_us(300);
+    configure_error_interrupt(false);
+
+    int error_triggered = read_error_gpio();
+
+    int testNumber = 8;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));
 
     read_tx_rx_gpio();

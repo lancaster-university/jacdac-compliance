@@ -7,6 +7,9 @@ JACDAC_TEST_EXTERN(3);
 JACDAC_TEST_EXTERN(4);
 JACDAC_TEST_EXTERN(5);
 JACDAC_TEST_EXTERN(6);
+JACDAC_TEST_EXTERN(7);
+JACDAC_TEST_EXTERN(8);
+JACDAC_TEST_EXTERN(9);
 
 
 int (*jacdac_tests[])() = {
@@ -17,6 +20,9 @@ int (*jacdac_tests[])() = {
     JACDAC_TEST_PTR(4),
     JACDAC_TEST_PTR(5),
     JACDAC_TEST_PTR(6),
+    JACDAC_TEST_PTR(7),
+    JACDAC_TEST_PTR(8),
+    JACDAC_TEST_PTR(9),
 };
 
 int jacdac_test_len = sizeof(jacdac_tests) / sizeof(jacdac_tests[0]);
