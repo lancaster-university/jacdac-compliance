@@ -14,7 +14,7 @@ typedef codal::JDPacket JDPacket;
 #define DEVICE_TESTER CODAL_STM32_BRAINPAD
 // #define DEVICE_UNDER_TEST CODAL_STM32_BRAINPAD
 
-#define SPECIFIC_TEST       7
+// #define SPECIFIC_TEST       9
 
 #ifdef DEVICE_TESTER
 #pragma message "DEVICE_TESTER"

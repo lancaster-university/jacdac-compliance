@@ -253,11 +253,19 @@ JACDAC_TEST(8)
 {
     read_error_gpio();
 
+
     configure_error_interrupt(true);
+
     set_jacdac_gpio(0);
     wait_us(10);
     set_jacdac_gpio(1);
     wait_us(40);
+
+    // because we leave no time gap
+    // an error should be generated after we send the lo pulse for this packet
+    int testNumber = 8;
+    // we have to send before our dummy writes, because there's a 160 us backoff in codal imp.
+    jacdac_send((uint8_t*)&testNumber, sizeof(int));
 
     for(int i = 0; i < 3; i++)
     {
@@ -267,13 +275,33 @@ JACDAC_TEST(8)
         wait_us(1);
     }
 
+    read_tx_rx_gpio();
+    configure_error_interrupt(true);
+    configure_tx_rx_interrupt(true);
+    wait_ms(20);
+    configure_tx_rx_interrupt(false);
     configure_error_interrupt(false);
 
-    get_jacdac_gpio(JACDAC_GPIO_PULL_MODE_UP);
+    int error_triggered_rx = read_error_gpio();
+
+    return (error_triggered_rx) ? 0 : -1;
+}
+
+// bus lo 10 us, never send data, send packet after.
+JACDAC_TEST(9)
+{
+    read_error_gpio();
+
+    configure_error_interrupt(true);
+    set_jacdac_gpio(0);
+    wait_us(10);
+    set_jacdac_gpio(1);
+    wait_us(350);
+    configure_error_interrupt(false);
 
     int error_triggered = read_error_gpio();
 
-    int testNumber = 7;
+    int testNumber = 9;
     jacdac_send((uint8_t*)&testNumber, sizeof(int));
 
     read_tx_rx_gpio();
@@ -289,34 +317,26 @@ JACDAC_TEST(8)
     return (error_triggered && packet_received && !error_triggered_rx) ? 0 : -1;
 }
 
-// bus lo 10 us, never send data, send packet after.
-JACDAC_TEST(9)
+// hold line low, ask device to send...
+JACDAC_TEST(10)
 {
     read_error_gpio();
 
+    int testNumber = 10;
+    jacdac_send((uint8_t*)&testNumber, sizeof(int));
+    wait_ms(20);
     configure_error_interrupt(true);
-    set_jacdac_gpio(0);
-    wait_us(10);
-    set_jacdac_gpio(1);
-    wait_us(300);
+    set_jacdac_gpio(!LINE_ACTIVE_VALUE);
+    set_tx_rx_gpio(LINE_ACTIVE_VALUE);
+    wait_us(20);
+    set_tx_rx_gpio(!LINE_ACTIVE_VALUE);
+    wait_ms(20);
     configure_error_interrupt(false);
+    get_jacdac_gpio(JACDAC_GPIO_PULL_MODE_UP);
 
     int error_triggered = read_error_gpio();
 
-    int testNumber = 8;
-    jacdac_send((uint8_t*)&testNumber, sizeof(int));
-
-    read_tx_rx_gpio();
-    configure_error_interrupt(true);
-    configure_tx_rx_interrupt(true);
-    wait_ms(20);
-    configure_tx_rx_interrupt(false);
-    configure_error_interrupt(false);
-
-    int packet_received = read_tx_rx_gpio();
-    int error_triggered_rx = read_error_gpio();
-
-    return (error_triggered && packet_received && !error_triggered_rx) ? 0 : -1;
+    return (error_triggered) ? 0 : -1;
 }
 
 #endif

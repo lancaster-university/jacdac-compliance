@@ -143,4 +143,14 @@ JACDAC_TEST(9)
     return 0;
 }
 
+// hold line low, ask device to send...
+JACDAC_TEST(10)
+{
+    while(get_tx_rx_gpio(JACDAC_GPIO_PULL_MODE_NONE) == !LINE_ACTIVE_VALUE);
+    wait_us(100);
+    int testNumber = 10;
+    jacdac_send((uint8_t*)&testNumber, sizeof(int));
+    return 0;
+}
+
 #endif
