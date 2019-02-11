@@ -26,9 +26,9 @@ PullMode translate_to_pullmode(int pm)
     return PullMode::Up;
 }
 
-void set_gpio(int val)
+extern "C" void set_gpio(int val)
 {
-    cplay.io.a4.setDigitalValue(val);
+    cplay.io.a0.setDigitalValue(val);
 }
 
 void set_gpio2(int val)
@@ -182,7 +182,7 @@ void set_error_gpio(int value)
 
 void set_test_status(int value)
 {
-    cplay.io.ledGreen.setDigitalValue(value);
+    // cplay.io.ledGreen.setDigitalValue(value);
 }
 
 int get_reset_gpio(int pm)
