@@ -24,9 +24,10 @@ int device_main()
     while(1)
     {
         while((packet = jacdac_receive()) == NULL);
-        DMESG("RECV");
-        int* testNumber = (int *)packet->data;
-        (*jacdac_tests[*testNumber])();
+        int testNumber = *((int *)packet->data);
+        (*jacdac_tests[testNumber])();
+        delete packet;
+        packet = NULL;
     }
 }
 
