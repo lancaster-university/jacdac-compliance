@@ -11,11 +11,11 @@ typedef codal::JDPacket JDPacket;
 #include <stdint.h>
 #include <stdio.h>
 
-#define CODAL_STM32_BRAINPAD        0
-#define CODAL_SAMD21_CPLAY          1
+#define CODAL_STM32_BRAINPAD        1
+#define CODAL_SAMD21_CPLAY          2
 
-#define DEVICE_TESTER CODAL_STM32_BRAINPAD
-// #define DEVICE_UNDER_TEST CODAL_STM32_BRAINPAD
+// #define DEVICE_TESTER CODAL_STM32_BRAINPAD
+#define DEVICE_UNDER_TEST CODAL_SAMD21_CPLAY
 
 // #define SPECIFIC_TEST       9
 
