@@ -26,7 +26,7 @@ PullMode translate_to_pullmode(int pm)
     return PullMode::Up;
 }
 
-void set_gpio(int val)
+extern "C" void set_gpio(int val)
 {
     bp.io.d1.setDigitalValue(val);
 }
@@ -115,6 +115,7 @@ void configure_reset_interrupt(bool enable)
 void device_init()
 {
     bp.init();
+    bp.io.d1.setDigitalValue(0);
     DEVICE_TESTER_PIN_RESET.setDigitalValue(0);
     DEVICE_TESTER_PIN_TX_RX.setDigitalValue(0);
     DEVICE_TESTER_PIN_ERROR.setDigitalValue(0);
@@ -153,7 +154,7 @@ void jacdac_send(JDPacket* packet)
 
 void jacdac_send(uint8_t* buf, int len)
 {
-    bp.jacdac.send(buf, len, 255, JDBaudRate::Baud250K);
+    bp.jacdac.send(buf, len, 255, JDBaudRate::Baud1M);
 }
 
 JDPacket* jacdac_receive()

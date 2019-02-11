@@ -15,8 +15,8 @@ int device_main()
     wait_us(100);
     set_reset_gpio(!LINE_ACTIVE_VALUE);
     wait_ms(20);
-    while(get_tx_rx_gpio(JACDAC_GPIO_PULL_MODE_UP) != LINE_ACTIVE_VALUE);
-    while(get_tx_rx_gpio(JACDAC_GPIO_PULL_MODE_UP) == LINE_ACTIVE_VALUE);
+    while(get_tx_rx_gpio(JACDAC_GPIO_PULL_MODE_NONE) != LINE_ACTIVE_VALUE);
+    while(get_tx_rx_gpio(JACDAC_GPIO_PULL_MODE_NONE) == LINE_ACTIVE_VALUE);
     set_test_status(1);
     wait_ms(1);
     set_test_status(0);
