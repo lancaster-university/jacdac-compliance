@@ -7,6 +7,12 @@
 extern int phys_test_len;
 extern int jacdac_test_len;
 
+struct JDResults
+{
+    uint16_t test_number;
+    int16_t result;
+};
+
 int device_main()
 {
     device_init();
@@ -32,13 +38,14 @@ int device_main()
 
     int success_count = 0;
 
-    int jacdac_results[jacdac_test_len];
+    JDResults jacdac_results[jacdac_test_len];
 
     for (int i = 0; i < jacdac_test_len; i++)
     {
-        jacdac_results[i] = (*jacdac_tests[i])();
+        jacdac_results[i].test_number = i;
+        jacdac_results[i].result = (*jacdac_tests[i])();
 
-        if (jacdac_results[i] >= 0)
+        if (jacdac_results[i].result >= 0)
             success_count++;
     }
 
@@ -47,6 +54,8 @@ int device_main()
     {
         DMESG("T%d: %d, ", i, jacdac_results[i]);
     }
+
+    jacdac_send((uint8_t*)jacdac_results,sizeof(jacdac_results));
 
     if (success_count == jacdac_test_len)
         set_test_status(1);

@@ -4,6 +4,7 @@
 
 #ifdef DEVICE_UNDER_TEST
 
+extern int jacdac_test_len;
 int device_main()
 {
     device_init();
@@ -25,7 +26,10 @@ int device_main()
     {
         while((packet = jacdac_receive()) == NULL);
         int testNumber = *((int *)packet->data);
-        (*jacdac_tests[testNumber])();
+
+        if (testNumber < jacdac_test_len)
+            (*jacdac_tests[testNumber])();
+
         delete packet;
         packet = NULL;
     }
