@@ -14,9 +14,10 @@ typedef codal::JDPacket JDPacket;
 #define CODAL_STM32_BRAINPAD        1
 #define CODAL_SAMD21_CPLAY          2
 #define CODAL_SAMD51_ITSY           3
+#define CODAL_NRF52_BLE_NANO        4
 
 // #define DEVICE_TESTER CODAL_STM32_BRAINPAD
-#define DEVICE_UNDER_TEST CODAL_SAMD51_ITSY
+#define DEVICE_UNDER_TEST CODAL_NRF52_BLE_NANO
 
 // #define SPECIFIC_TEST       9
 
