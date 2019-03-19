@@ -144,7 +144,7 @@ void jacdac_protocol_init()
 
 void jacdac_send_no_crc(JDPacket* packet)
 {
-    bp.jacdac.send(packet, false);
+    bp.jacdac.bus.send(packet, false);
 }
 
 void jacdac_send(JDPacket* packet)
@@ -154,12 +154,12 @@ void jacdac_send(JDPacket* packet)
 
 void jacdac_send(uint8_t* buf, int len)
 {
-    bp.jacdac.send(buf, len, 255, 0, JDBaudRate::Baud1M);
+    bp.jacdac.bus.send(buf, len, 255, 0, JDBaudRate::Baud1M);
 }
 
 JDPacket* jacdac_receive()
 {
-    return bp.jacdac.getPacket();
+    return bp.jacdac.bus.getPacket();
 }
 
 void set_jacdac_gpio(int value)
