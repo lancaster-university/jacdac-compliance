@@ -94,7 +94,8 @@ JACDAC_TEST(3)
     JDPacket* packet = new JDPacket;
     memset(packet, 0, sizeof(JDPacket));
 
-    packet->address = 255;
+    packet->device_address = 255;
+    packet->service_number = 0;
     packet->size = 4;
     int* data = (int*)packet->data;
     *data = 3;

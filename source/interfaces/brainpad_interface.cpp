@@ -154,7 +154,7 @@ void jacdac_send(JDPacket* packet)
 
 void jacdac_send(uint8_t* buf, int len)
 {
-    bp.jacdac.send(buf, len, 255, JDBaudRate::Baud1M);
+    bp.jacdac.send(buf, len, 255, 0, JDBaudRate::Baud1M);
 }
 
 JDPacket* jacdac_receive()
